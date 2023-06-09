@@ -62,39 +62,41 @@ for idx,new_start in enumerate(new_species_indices):
 
 data_dict = dataset
 
-data_dict = dataset
-
 bacteria_options = list(data_dict.keys())
-selected_bacteria = st.selectbox('Select a bacteria', bacteria_options)
+selected_bacteria = st.multiselect('Select bacteria', bacteria_options)
 
-concentration_options = list(data_dict[selected_bacteria].keys())
+# Iterate through all selected bacteria
+for bacteria in selected_bacteria:
 
-# Base colors for the concentrations (you might want to add more colors here if there are more concentrations)
-base_colors = ['#0000ff', '#ff0000', '#008000', '#800080', '#ffa500']
+    concentration_options = list(data_dict[bacteria].keys())
 
-# Create a plotly graph
-fig = go.Figure()
+    # Base colors for the concentrations (you might want to add more colors here if there are more concentrations)
+    base_colors = ['#0000ff', '#ff0000', '#008000', '#800080', '#ffa500']
 
-# For each concentration, add a trace with a color that is a shade of the base color
-for i, concentration in enumerate(concentration_options):
-    # Access the waveform data
-    waveforms = data_dict[selected_bacteria][concentration]
-    color_shades = get_darker_shades(base_colors[i % len(base_colors)], len(waveforms))
-    
-    for j, waveform in enumerate(waveforms):
-        color = color_shades[j]
-        fig.add_trace(go.Scatter(x=wavelengths, y=waveform.astype(float), mode='lines', line=dict(color=color), name=f'{concentration} Measurement {j+1}'))
+    # Create a plotly graph
+    fig = go.Figure()
 
-fig.update_layout(
-    title=f'{selected_bacteria} Concentrations',
-    xaxis_title='Wavelength',
-    yaxis_title='Value',
-    autosize=False,
-    width=800,
-    height=500,
-)
+    # For each concentration, add a trace with a color that is a shade of the base color
+    for i, concentration in enumerate(concentration_options):
+        # Access the waveform data
+        waveforms = data_dict[bacteria][concentration]
+        color_shades = get_darker_shades(base_colors[i % len(base_colors)], len(waveforms))
+        
+        for j, waveform in enumerate(waveforms):
+            color = color_shades[j]
+            fig.add_trace(go.Scatter(x=wavelengths, y=waveform.astype(float), mode='lines', line=dict(color=color), name=f'{concentration} Measurement {j+1}'))
 
-st.plotly_chart(fig, use_container_width=True)
+    fig.update_layout(
+        title=f'{bacteria} Concentrations',
+        xaxis_title='Wavelength',
+        yaxis_title='Value',
+        autosize=False,
+        width=800,
+        height=500,
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
 
 # concentration_options = list(data_dict[selected_bacteria].keys())
 
