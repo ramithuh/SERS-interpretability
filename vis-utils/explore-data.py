@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 
 
 from matplotlib import colors as mcolors
+from helpers import remove_duplicates
 
 
 def get_darker_shades(base_color, n):
@@ -14,7 +15,7 @@ def get_darker_shades(base_color, n):
     shades = [mcolors.hsv_to_rgb([base_color_hsv[0], base_color_hsv[1], max(0, base_color_hsv[2] - i * 0.05)]) for i in range(n)]
     return [mcolors.rgb2hex(shade) for shade in shades]
 
-data = genfromtxt('/content/AllBacteria.csv', delimiter=',',dtype='str')
+data = genfromtxt('AllBacteria_DataForclustering-to-colab.csv', delimiter=',',dtype='str')
 data = np.char.lower(data) #convert to lowercase
 
 new_species_indices = [i for i, item in enumerate(data[0,:]) if item.startswith('name')]
@@ -32,7 +33,7 @@ for idx,new_start in enumerate(new_species_indices):
     end = new_species_indices[idx+1]
 
   #extract concentration
-  if(data[0,new_start+1] == 'concentration' or 'conc.'):
+  if('conc' in data[0,new_start+1]):
     concentration = data[1,new_start+1]
   else:
     raise ValueError(f"Expected 'concentration' at position {new_start+1}, but found {data[0,new_start+1]} instead.")
@@ -60,7 +61,7 @@ for idx,new_start in enumerate(new_species_indices):
     dataset[bacteria_name][concentration].append(measurement)
     num_samples += 1
 
-data_dict = dataset
+data_dict = remove_duplicates(dataset)
 
 bacteria_options = list(data_dict.keys())
 selected_bacteria = st.multiselect('Select bacteria', bacteria_options)
